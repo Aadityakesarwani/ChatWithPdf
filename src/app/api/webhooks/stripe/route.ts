@@ -1,3 +1,5 @@
+//stripe boilerplate
+
 import { db } from '@/db'
 import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
         session.subscription as string
       )
 
+      console.log('Subscription details:', subscription);
+
     await db.user.update({
       where: {
         id: session.metadata.userId,
@@ -50,8 +54,10 @@ export async function POST(request: Request) {
         stripeCurrentPeriodEnd: new Date(
           subscription.current_period_end * 1000
         ),
-      },
-    })
+      },  
+    }
+    )
+
   }
 
   if (event.type === 'invoice.payment_succeeded') {
@@ -60,6 +66,10 @@ export async function POST(request: Request) {
       await stripe.subscriptions.retrieve(
         session.subscription as string
       )
+
+
+      console.log('Subscription details:', subscription);
+
 
     await db.user.update({
       where: {
